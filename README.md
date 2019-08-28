@@ -42,6 +42,6 @@ Put your file in the same directory and specify the filename in the script.
 
 When you are all setup, run the script:
 
-    # python3 send_email.py
+    $ python3 send_email.py
 
 This is handy if you have regular template emails you send out to groups.
