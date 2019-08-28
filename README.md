@@ -4,10 +4,11 @@ Send a plaintext email message with an optional attachment to a list of
 email recipients.
 
 	send_email.py			# edit this and run
+	email_recipients.txt	# your list of recipients
 	message.txt				# write your message in here in plaintext
 	send_log.txt			# keep a log of each sent message
 
-List your email addresses one per line:
+List your email addresses one per line on email_recipients.txt:
 
     email1@example.com
 	email2@example.com
