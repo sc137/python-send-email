@@ -35,6 +35,9 @@ filename = ''
 username = keyring.get_password('system', 'email_username')
 password = keyring.get_password('system', 'email_password')
 
+# insert your smtp server here
+mail_server = ''                
+
 # list of email addresses to send to
 listFile = "email_recipients.txt"
 
@@ -81,7 +84,8 @@ for recipient in email_list.readlines():
 
     msg = MIMEMultipart()
     msg['Subject'] = '[TESTING] Automated message status'
-    msg['From'] = 'sable@cantus.us'
+    msg['From'] = ''
+    # msg['Reply-To'] = ''
     msg['To'] = recipient
 
     # attach the body text to the msg
@@ -98,7 +102,7 @@ for recipient in email_list.readlines():
 
         msg.attach(part)
 
-    server = smtplib.SMTP('mail.hover.com', 587)
+    server = smtplib.SMTP(mail_server, 587)
     server.starttls()
     server.ehlo()
     server.login(username, password)
