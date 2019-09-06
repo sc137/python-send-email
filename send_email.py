@@ -19,24 +19,28 @@ from email.mime.base import MIMEBase
 from email import encoders
 
 ##########################################################
-#
+#           edit these every time                        #
+
 # send later by setting the time to delay until
 #                               YYYY, MM, DD, HH, MM, SS
 delay_until = datetime.datetime(2019, 8, 26, 13, 40, 0)
-#
-##########################################################
+
+# What is the subject of your email?
+mail_subject = '[TESTING] Automated message status'
+
+# insert your smtp server here
+mail_server = 'mail.hover.com'
 
 # specify a file to attach in the same directory
 filename = ''
+
+##########################################################
 
 # store your username and password with the keyring modue
 # keyring set system email_username
 # keyring set system email_password
 username = keyring.get_password('system', 'email_username')
-password = keyring.get_password('system', 'email_password')
-
-# insert your smtp server here
-mail_server = ''                
+password = keyring.get_password('system', 'email_password')    
 
 # list of email addresses to send to
 listFile = "email_recipients.txt"
@@ -50,14 +54,16 @@ else:
 
 # put a line in the logfile for each send
 if os.path.isfile('send_log.txt'):
-    pass
+    logFile = open('send_log.txt', 'a+')
+    logFile.write('\n')                 # start log entry on a new line
+    logFile.close()
 else:
     print("No log file present...")
     sys.exit()                      # exit if no log file
 
 # timestamp the log entries
 timestamp = datetime.datetime.now()
-timestamp = timestamp.strftime('%Y-%m-%-d %H:%M:%S')
+timestamp = timestamp.strftime('%Y-%m-%-d_%H:%M:%S')
 
 # message of the email to send
 message_file  = "message.txt"
@@ -70,20 +76,16 @@ else:
     print('no message file {}'.format(message_file))
     sys.exit()                      # exit if no message file
 
-##########################################################
-#
 # pause everything until the delay_until time...
 while datetime.datetime.now() < delay_until:
     time.sleep(1)
-#
-##########################################################
 
 # opens the list file and send email to each recipient (one per line)
 email_list = open(listFile)
 for recipient in email_list.readlines():
 
     msg = MIMEMultipart()
-    msg['Subject'] = '[TESTING] Automated message status'
+    msg['Subject'] = mail_subject
     msg['From'] = ''
     # msg['Reply-To'] = ''
     msg['To'] = recipient
