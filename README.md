@@ -49,3 +49,11 @@ When you are all setup, run the script:
     $ python3 send_email.py
 
 This is handy if you have regular template emails you send out to groups.
+
+**Testing and Alternate Recipient Lists**
+
+You can specify an email list as a command line argument:
+
+    $ send_email.py test_list.txt
+
+This will send to the test_list.txt instead of email_recipients.txt. This is useful to send yourself a test run to check the message prior to sending to the entire list.

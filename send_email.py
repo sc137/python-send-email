@@ -1,58 +1,83 @@
 #! /usr/bin/env python3
-# send_email.py
-# sable cantus
-# https://cantus.us
-# Aug 2019
+# send_email.py my_email_list.txt
+# An email utility to send messages to a list of recipients
 
 import os
 import sys
 import time
 import datetime
 import smtplib
-# store email username and password in the keyring module
-# pip3 install keyring
+import pkg_resources
+
+# check that keyring is installed
+try:
+    pkg_resources.require('keyring')
+except:
+    sys.exit('dependency needed: $ pip3 install keyring')
 import keyring
-# from credentials import *
+
+
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
+from shutil import copyfile
+
+def check_list(listFile):
+    # check for the recipient list
+    if os.path.isfile(listFile):
+        pass
+    else:
+        print("No {} present.".format(listFile))
+        sys.exit()                      # exit if no recipients
+
+##################### RECIPIENTS ##########################
+# Check if a specific email list is provided as an argument
+# if none, then use email_recipients.txt
+if len(sys.argv) == 2:
+    listFile = sys.argv[1]
+    check_list(listFile)
+    print("Sending to {}".format(listFile))
+else:
+    listFile = "email_recipients.txt"
+    check_list(listFile)
+    print("Sending to {}".format(listFile))
+
+# Check that the subject has been updated, exit if "n"
+updated_subject = input("Did you update the subject line? (y/n) ")
+if updated_subject.lower() != 'y':
+    print("Please update the subject line.")
+    exit()
 
 ##########################################################
 #           edit these every time                        #
+##########################################################
 
+##################### DELAY UNTIL ########################
 # send later by setting the time to delay until
 #                               YYYY, MM, DD, HH, MM, SS
 delay_until = datetime.datetime(2019, 8, 26, 13, 40, 0)
 
+##################### SUBJECT ############################
 # What is the subject of your email?
 mail_subject = '[TESTING] Automated message status'
 
+##################### SMTP SERVER##########################
 # insert your smtp server here
-mail_server = 'mail.hover.com'
+mail_server = ''
 
+##################### ATTACHMENT ##########################
 # specify a file to attach in the same directory
 filename = ''
 
-##########################################################
-
+##################### CREDENTIALS ########################
 # store your username and password with the keyring modue
 # keyring set system email_username
 # keyring set system email_password
 username = keyring.get_password('system', 'email_username')
 password = keyring.get_password('system', 'email_password')    
 
-# list of email addresses to send to
-listFile = "email_recipients.txt"
-
-# check for the recipient list
-if os.path.isfile(listFile):
-    pass
-else:
-    print("No {} present.".format(listFile))
-    sys.exit()                      # exit if no recipients
-
-# put a line in the logfile for each send
+##################### LOG ###############################
 if os.path.isfile('send_log.txt'):
     logFile = open('send_log.txt', 'a+')
     logFile.write('\n')                 # start log entry on a new line
@@ -117,3 +142,15 @@ for recipient in email_list.readlines():
     logFile = open('send_log.txt', 'a+')
     logFile.write(logEntry)
     logFile.close()
+
+##################### ARCHIVES ############################
+filetimestamp = datetime.datetime.now()
+filetimestamp = filetimestamp.strftime('%Y%m%d%H%M%S')
+
+message_bkp = filetimestamp + '_' + message_file
+copyfile(message_file, message_bkp)
+print("Copied " + message_file+ " to " + message_bkp)
+
+recipient_bkp = filetimestamp + '_' + listFile
+copyfile(listFile, recipient_bkp)
+print("Copied " + listFile + " to " + recipient_bkp)
