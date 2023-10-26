@@ -1,27 +1,20 @@
 #! /usr/bin/env python3
 # send_email.py my_email_list.txt
 # An email utility to send messages to a list of recipients
+# sable cantus
 
 import os
 import sys
 import time
 import datetime
 import smtplib
-import pkg_resources
-
-# check that keyring is installed
-try:
-    pkg_resources.require('keyring')
-except:
-    sys.exit('dependency needed: $ pip3 install keyring')
 import keyring
-
-
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from shutil import copyfile
+import subject
 
 def check_list(listFile):
     # check for the recipient list
@@ -44,31 +37,41 @@ else:
     print("Sending to {}".format(listFile))
 
 # Check that the subject has been updated, exit if "n"
-updated_subject = input("Did you update the subject line? (y/n) ")
+print("Subject: ", subject.subject)
+updated_subject = input("Subject OK? (y/n) ")
 if updated_subject.lower() != 'y':
-    print("Please update the subject line.")
+    print("Exiting.")
     exit()
-
-##########################################################
-#           edit these every time                        #
-##########################################################
 
 ##################### DELAY UNTIL ########################
 # send later by setting the time to delay until
 #                               YYYY, MM, DD, HH, MM, SS
 delay_until = datetime.datetime(2019, 8, 26, 13, 40, 0)
 
-##################### SUBJECT ############################
-# What is the subject of your email?
-mail_subject = '[TESTING] Automated message status'
-
-##################### SMTP SERVER##########################
+##################### SMTP SERVER #########################
 # insert your smtp server here
 mail_server = ''
+
+##################### EMAIL SUBJECT #######################
+email_subject = subject.subject
 
 ##################### ATTACHMENT ##########################
 # specify a file to attach in the same directory
 filename = ''
+
+if len(filename) > 0:
+    print("Attachment: ", filename)
+    attachment = input("Continue? (y/n) ")
+    if attachment.lower() != 'y':
+        print("Exiting.")
+        exit()
+else:
+    print("No attachment specified.")
+    attachment = input("Continue? (y/n) ")
+    if attachment.lower() != 'y':
+        print("Exiting.")
+        exit()
+
 
 ##################### CREDENTIALS ########################
 # store your username and password with the keyring modue
@@ -101,17 +104,19 @@ else:
     print('no message file {}'.format(message_file))
     sys.exit()                      # exit if no message file
 
+##########################################################
 # pause everything until the delay_until time...
 while datetime.datetime.now() < delay_until:
     time.sleep(1)
 
+##################### SEND EMAIL ##########################
 # opens the list file and send email to each recipient (one per line)
 email_list = open(listFile)
 for recipient in email_list.readlines():
 
     msg = MIMEMultipart()
     msg['Subject'] = mail_subject
-    msg['From'] = ''
+    msg['From'] = ''        # "Your Name <your@email.com>"
     # msg['Reply-To'] = ''
     msg['To'] = recipient
 

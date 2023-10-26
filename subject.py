@@ -1,0 +1,1 @@
+subject = "[TEST] An automated message from python"
